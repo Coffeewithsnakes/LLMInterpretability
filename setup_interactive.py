@@ -185,12 +185,20 @@ try:
 except ImportError as e:
     print("❌ PyTorch not found:", e)
     sys.exit(1)
+except Exception as e:
+    print("❌ PyTorch error:", e)
+    sys.exit(1)
 
 try:
     import transformer_lens
-    print("✅ TransformerLens:", transformer_lens.__version__)
+    # TransformerLens doesn't have __version__, just check if we can import HookedTransformer
+    from transformer_lens import HookedTransformer
+    print("✅ TransformerLens: Installed")
 except ImportError as e:
     print("❌ TransformerLens not found:", e)
+    sys.exit(1)
+except Exception as e:
+    print("❌ TransformerLens error:", e)
     sys.exit(1)
 
 try:
@@ -198,6 +206,9 @@ try:
     print("✅ NumPy:", numpy.__version__)
 except ImportError as e:
     print("❌ NumPy not found:", e)
+    sys.exit(1)
+except Exception as e:
+    print("❌ NumPy error:", e)
     sys.exit(1)
 
 print("\\n✅ All core dependencies are working!")

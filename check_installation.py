@@ -87,7 +87,9 @@ def main():
 
     def check_transformerlens():
         import transformer_lens
-        return f"v{transformer_lens.__version__}"
+        from transformer_lens import HookedTransformer
+        # TransformerLens doesn't have __version__
+        return "Installed"
 
     if not check_item(
         "TransformerLens",

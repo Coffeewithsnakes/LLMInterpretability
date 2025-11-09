@@ -127,14 +127,32 @@ def emotion_circuits_wizard():
         from src.behavior_detection import EmotionCircuitDetector
         from src.utils.data_utils import create_emotion_dataset
         import torch
+    except ImportError as e:
+        show_error(f"Missing dependencies: {e}")
+        print("\nℹ️  Run 'python setup_interactive.py' to install dependencies")
+        wait_for_user()
+        main_menu()
+        return
 
+    try:
         print("\n⏳ Loading model (this may take a minute)...")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
         detector = EmotionCircuitDetector(
             model_name="gpt2-small",
-            device="cuda" if torch.cuda.is_available() else "cpu"
+            device=device
         )
-        show_success("Model loaded!")
+        show_success(f"Model loaded on {device}!")
 
+    except Exception as e:
+        show_error(f"Failed to load model: {e}")
+        print("\nℹ️  Try using CPU instead or check your internet connection")
+        print("   The model downloads on first use (~500MB)")
+        wait_for_user()
+        main_menu()
+        return
+
+    try:
         # Choose emotion
         print_header()
         print("Which emotion would you like to discover?")
@@ -146,7 +164,7 @@ def emotion_circuits_wizard():
             return
 
         emotion_map = {1: "happiness", 2: "sadness", 3: "anger"}
-        emotion = emotion_map[emotion_choice]
+        emotion = emotion_map.get(emotion_choice, "happiness")
 
         print(f"\n⏳ Discovering circuit for {emotion}...")
         print("This will take 2-3 minutes...")
@@ -205,26 +223,45 @@ def emotion_circuits_wizard():
 
         # Save option
         print("\n💾 Would you like to save these results?")
-        save = input("(y/n): ").lower().strip()
-        if save == 'y':
-            filename = f"{emotion}_circuit_results.txt"
-            with open(filename, 'w') as f:
-                f.write(f"Emotion Circuit: {emotion}\n")
-                f.write("=" * 50 + "\n\n")
-                f.write(circuit.summary() + "\n\n")
-                f.write("Test Results:\n")
-                for name, text in results.items():
-                    f.write(f"\n{name}:\n{text}\n")
-            show_success(f"Results saved to {filename}")
+        try:
+            save = input("(y/n): ").lower().strip()
+            if save == 'y':
+                filename = f"{emotion}_circuit_results.txt"
+                with open(filename, 'w', encoding='utf-8') as f:
+                    f.write(f"Emotion Circuit: {emotion}\n")
+                    f.write("=" * 50 + "\n\n")
+                    f.write(circuit.summary() + "\n\n")
+                    f.write("Test Results:\n")
+                    for name, text in results.items():
+                        f.write(f"\n{name}:\n{text}\n")
+                show_success(f"Results saved to {filename}")
+        except Exception as e:
+            show_error(f"Failed to save results: {e}")
 
-    except ImportError as e:
-        show_error(f"Missing dependencies: {e}")
-        print("\nℹ️  Run 'python setup_interactive.py' to install dependencies")
+    except RuntimeError as e:
+        if "out of memory" in str(e).lower() or "cuda" in str(e).lower():
+            show_error("GPU out of memory!")
+            print("\nℹ️  Try one of these solutions:")
+            print("   1. Close other applications to free memory")
+            print("   2. Restart and use CPU: device='cpu'")
+            print("   3. Use a smaller model like 'distilgpt2'")
+        else:
+            show_error(f"Runtime error: {e}")
+            print("\nℹ️  Check TROUBLESHOOTING.md for help")
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Operation cancelled by user")
     except Exception as e:
-        show_error(f"Error: {e}")
-        print("\nℹ️  Check TROUBLESHOOTING.md for help")
+        show_error(f"Unexpected error: {e}")
+        print("\nℹ️  This might help:")
+        print("   • Check your internet connection (models download on first use)")
+        print("   • Make sure you have enough disk space (~2GB)")
+        print("   • Try using CPU instead of GPU")
+        print("   • See TROUBLESHOOTING.md for more solutions")
         import traceback
-        traceback.print_exc()
+        with open("error_log.txt", "w") as f:
+            f.write("Error log:\n")
+            traceback.print_exc(file=f)
+        print("\n   Error details saved to error_log.txt")
 
     wait_for_user()
     main_menu()
@@ -244,14 +281,29 @@ def deceptive_alignment_wizard():
     try:
         from src.behavior_detection import DeceptiveAlignmentDetector
         import torch
+    except ImportError as e:
+        show_error(f"Missing dependencies: {e}")
+        print("\nℹ️  Run 'python setup_interactive.py' to install dependencies")
+        wait_for_user()
+        main_menu()
+        return
 
+    try:
         print("\n⏳ Loading model...")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         detector = DeceptiveAlignmentDetector(
             model_name="gpt2-small",
-            device="cuda" if torch.cuda.is_available() else "cpu"
+            device=device
         )
-        show_success("Model loaded!")
+        show_success(f"Model loaded on {device}!")
+    except Exception as e:
+        show_error(f"Failed to load model: {e}")
+        print("\nℹ️  Try using CPU or check your internet connection")
+        wait_for_user()
+        main_menu()
+        return
 
+    try:
         # Create scenarios
         print("\n⏳ Creating test scenarios...")
         scenarios = detector.create_situational_awareness_scenarios()
@@ -316,13 +368,21 @@ def deceptive_alignment_wizard():
                     else:
                         print("    ✅ LOW deception score")
 
-    except ImportError as e:
-        show_error(f"Missing dependencies: {e}")
-        print("\nℹ️  Run 'python setup_interactive.py' to install dependencies")
+    except RuntimeError as e:
+        if "out of memory" in str(e).lower():
+            show_error("GPU out of memory!")
+            print("\nℹ️  Use CPU mode or close other applications")
+        else:
+            show_error(f"Runtime error: {e}")
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Operation cancelled by user")
     except Exception as e:
-        show_error(f"Error: {e}")
+        show_error(f"Unexpected error: {e}")
+        print("\nℹ️  See TROUBLESHOOTING.md for solutions")
         import traceback
-        traceback.print_exc()
+        with open("deception_error.txt", "w") as f:
+            traceback.print_exc(file=f)
+        print("   Error details saved to deception_error.txt")
 
     wait_for_user()
     main_menu()
@@ -345,13 +405,29 @@ def power_seeking_wizard():
     try:
         from src.behavior_detection import PowerSeekingDetector
         import torch
+    except ImportError as e:
+        show_error(f"Missing dependencies: {e}")
+        print("\nℹ️  Run 'python setup_interactive.py' to install dependencies")
+        wait_for_user()
+        main_menu()
+        return
 
+    try:
         print("\n⏳ Loading model...")
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         detector = PowerSeekingDetector(
             model_name="gpt2-small",
-            device="cuda" if torch.cuda.is_available() else "cpu"
+            device=device
         )
-        show_success("Model loaded!")
+        show_success(f"Model loaded on {device}!")
+    except Exception as e:
+        show_error(f"Failed to load model: {e}")
+        print("\nℹ️  Try using CPU or check your internet connection")
+        wait_for_user()
+        main_menu()
+        return
+
+    try:
 
         # Create scenarios
         print("\n⏳ Creating test scenarios...")
@@ -420,13 +496,21 @@ def power_seeking_wizard():
             else:
                 print("✅ LOW convergence - power-seeking varies by goal")
 
-    except ImportError as e:
-        show_error(f"Missing dependencies: {e}")
-        print("\nℹ️  Run 'python setup_interactive.py' to install dependencies")
+    except RuntimeError as e:
+        if "out of memory" in str(e).lower():
+            show_error("GPU out of memory!")
+            print("\nℹ️  Use CPU mode or close other applications")
+        else:
+            show_error(f"Runtime error: {e}")
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Operation cancelled by user")
     except Exception as e:
-        show_error(f"Error: {e}")
+        show_error(f"Unexpected error: {e}")
+        print("\nℹ️  See TROUBLESHOOTING.md for solutions")
         import traceback
-        traceback.print_exc()
+        with open("power_seeking_error.txt", "w") as f:
+            traceback.print_exc(file=f)
+        print("   Error details saved to power_seeking_error.txt")
 
     wait_for_user()
     main_menu()
@@ -444,15 +528,40 @@ def quick_demo():
     wait_for_user()
 
     try:
-        print("\n⏳ Loading model...")
         from src.behavior_detection import EmotionCircuitDetector
+        from src.utils.data_utils import create_emotion_dataset
         import torch
+    except ImportError as e:
+        show_error(f"Missing dependencies: {e}")
+        print("\nℹ️  Run 'python setup_interactive.py' to install dependencies")
+        wait_for_user()
+        main_menu()
+        return
 
-        detector = EmotionCircuitDetector(model_name="gpt2-small", device="cpu")
+    try:
+        print("\n⏳ Loading model (this may take a minute on first run)...")
+        print("   (The model will be downloaded and cached)")
+
+        detector = EmotionCircuitDetector(
+            model_name="gpt2-small",
+            device="cpu"  # Use CPU for maximum compatibility
+        )
         show_success("Model loaded!")
 
+    except Exception as e:
+        show_error(f"Failed to load model: {e}")
+        print("\nℹ️  Common causes:")
+        print("   • First run downloads ~500MB - check your internet")
+        print("   • Low disk space - need ~2GB free")
+        print("   • Firewall blocking download - try different network")
+        wait_for_user()
+        main_menu()
+        return
+
+    try:
         print("\n⏳ Discovering happiness circuit...")
-        from src.utils.data_utils import create_emotion_dataset
+        print("   (Using 3 examples for speed - normally use 5-10)")
+
         data = create_emotion_dataset()
 
         circuit = detector.discover_emotion_circuit(
@@ -465,22 +574,33 @@ def quick_demo():
 
         show_success(f"Found circuit with {len(circuit.components)} components!")
 
-        print("\n⏳ Testing emotion control...")
-        test_prompt = ["I just got the news. I feel"]
+        if len(circuit.components) == 0:
+            print("\n⚠️  No components found (threshold might be too high)")
+            print("   This is OK for a demo - try the full version with more examples!")
+        else:
+            print("\n⏳ Testing emotion control...")
+            test_prompt = ["I just got the news. I feel"]
 
-        normal = detector.modulate_emotion(circuit, test_prompt, intensity=1.0)
-        amplified = detector.modulate_emotion(circuit, test_prompt, intensity=2.0)
+            normal = detector.modulate_emotion(circuit, test_prompt, intensity=1.0)
+            amplified = detector.modulate_emotion(circuit, test_prompt, intensity=2.0)
 
-        print("\n📊 Results:")
-        print(f"\nNormal: {normal[0][:100]}...")
-        print(f"\nAmplified (2x happiness): {amplified[0][:100]}...")
+            print("\n📊 Results:")
+            print(f"\nNormal: {normal[0][:100]}...")
+            print(f"\nAmplified (2x happiness): {amplified[0][:100]}...")
 
-        show_success("\n✅ Demo complete! You can now see how circuit modulation changes outputs.")
+        show_success("\n✅ Demo complete! You can now see how circuit modulation works.")
+        print("\nℹ️  For better results, try the full 'Emotion Circuits' option with more examples!")
 
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Demo cancelled by user")
     except Exception as e:
         show_error(f"Demo failed: {e}")
+        print("\nℹ️  Don't worry - this is just a quick demo!")
+        print("   Try the full version from the main menu for better error handling.")
         import traceback
-        traceback.print_exc()
+        with open("demo_error.txt", "w") as f:
+            traceback.print_exc(file=f)
+        print("\n   Error details saved to demo_error.txt")
 
     wait_for_user()
     main_menu()
