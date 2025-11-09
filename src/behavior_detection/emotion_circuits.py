@@ -270,22 +270,30 @@ class EmotionCircuitDetector:
         """
         inputs = self.model.to_tokens(prompts)
 
-        # Create hooks to modulate circuit components
+        # Create modulation hook that multiplies activations by intensity
         def modulation_hook(activation, hook):
             """Multiply activation by intensity."""
             return activation * intensity
 
-        hooks = [(comp, modulation_hook) for comp in circuit.components]
+        # Add hooks to all circuit components
+        hook_handles = []
+        for component_name in circuit.components:
+            handle = self.model.add_hook(component_name, modulation_hook)
+            hook_handles.append(handle)
 
-        # Generate with modulated circuit
-        with torch.no_grad():
-            outputs = self.model.generate(
-                inputs,
-                max_new_tokens=50,
-                fwd_hooks=hooks,
-                do_sample=True,
-                temperature=0.8
-            )
+        try:
+            # Generate with modulated circuit
+            with torch.no_grad():
+                outputs = self.model.generate(
+                    inputs,
+                    max_new_tokens=50,
+                    do_sample=True,
+                    temperature=0.8
+                )
+        finally:
+            # Always remove hooks, even if generation fails
+            for handle in hook_handles:
+                handle.remove()
 
         # Decode outputs
         generated_texts = [
