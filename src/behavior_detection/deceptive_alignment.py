@@ -148,6 +148,25 @@ class DeceptiveAlignmentDetector:
         honest_tokens = self.model.to_tokens(scenario.honest_prompts)
         deceptive_tokens = self.model.to_tokens(scenario.deceptive_prompts)
 
+        # Pad to same sequence length (required for activation patching)
+        max_len = max(honest_tokens.shape[1], deceptive_tokens.shape[1])
+
+        if honest_tokens.shape[1] < max_len:
+            padding = torch.zeros(
+                (honest_tokens.shape[0], max_len - honest_tokens.shape[1]),
+                dtype=honest_tokens.dtype,
+                device=honest_tokens.device
+            )
+            honest_tokens = torch.cat([honest_tokens, padding], dim=1)
+
+        if deceptive_tokens.shape[1] < max_len:
+            padding = torch.zeros(
+                (deceptive_tokens.shape[0], max_len - deceptive_tokens.shape[1]),
+                dtype=deceptive_tokens.dtype,
+                device=deceptive_tokens.device
+            )
+            deceptive_tokens = torch.cat([deceptive_tokens, padding], dim=1)
+
         # Define metric: preference for deceptive vs honest completions
         def deception_metric(logits):
             """

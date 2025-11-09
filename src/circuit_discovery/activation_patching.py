@@ -109,9 +109,13 @@ class ActivationPatcher:
         def patch_hook(activation, hook):
             """Hook function that patches the activation."""
             if position is not None:
-                activation[:, position, :] = clean_activation[:, position, :]
+                # Patch specific position
+                if position < activation.shape[1] and position < clean_activation.shape[1]:
+                    activation[:, position, :] = clean_activation[:, position, :]
             else:
-                activation[:] = clean_activation
+                # Patch all positions - handle different sequence lengths
+                min_seq_len = min(activation.shape[1], clean_activation.shape[1])
+                activation[:, :min_seq_len, :] = clean_activation[:, :min_seq_len, :]
             return activation
 
         # Run model with patching hook

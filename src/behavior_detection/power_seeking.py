@@ -206,6 +206,25 @@ class PowerSeekingDetector:
         power_tokens = self.model.to_tokens(scenario.power_seeking_prompts)
         cooperative_tokens = self.model.to_tokens(scenario.non_seeking_prompts)
 
+        # Pad to same sequence length (required for activation patching)
+        max_len = max(power_tokens.shape[1], cooperative_tokens.shape[1])
+
+        if power_tokens.shape[1] < max_len:
+            padding = torch.zeros(
+                (power_tokens.shape[0], max_len - power_tokens.shape[1]),
+                dtype=power_tokens.dtype,
+                device=power_tokens.device
+            )
+            power_tokens = torch.cat([power_tokens, padding], dim=1)
+
+        if cooperative_tokens.shape[1] < max_len:
+            padding = torch.zeros(
+                (cooperative_tokens.shape[0], max_len - cooperative_tokens.shape[1]),
+                dtype=cooperative_tokens.dtype,
+                device=cooperative_tokens.device
+            )
+            cooperative_tokens = torch.cat([cooperative_tokens, padding], dim=1)
+
         # Define metric
         def power_seeking_metric(logits):
             """Measure tendency toward power-seeking responses."""

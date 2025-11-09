@@ -91,6 +91,27 @@ class EmotionCircuitDetector:
         clean_tokens = self.model.to_tokens(clean_prompts)
         neutral_tokens = self.model.to_tokens(neutral_prompts)
 
+        # Pad to same sequence length (required for activation patching)
+        max_len = max(clean_tokens.shape[1], neutral_tokens.shape[1])
+
+        if clean_tokens.shape[1] < max_len:
+            # Pad clean tokens
+            padding = torch.zeros(
+                (clean_tokens.shape[0], max_len - clean_tokens.shape[1]),
+                dtype=clean_tokens.dtype,
+                device=clean_tokens.device
+            )
+            clean_tokens = torch.cat([clean_tokens, padding], dim=1)
+
+        if neutral_tokens.shape[1] < max_len:
+            # Pad neutral tokens
+            padding = torch.zeros(
+                (neutral_tokens.shape[0], max_len - neutral_tokens.shape[1]),
+                dtype=neutral_tokens.dtype,
+                device=neutral_tokens.device
+            )
+            neutral_tokens = torch.cat([neutral_tokens, padding], dim=1)
+
         # Prepare answer tokens if provided
         if target_tokens:
             answer_token_ids = []
