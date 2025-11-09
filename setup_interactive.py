@@ -143,17 +143,73 @@ def install_dependencies():
     except:
         print_warning("Could not upgrade pip, continuing anyway...")
 
-    # Install PyTorch (CPU version for compatibility)
+    # Install PyTorch (GPU-aware installation)
     print_info("\n📦 Installing PyTorch (this is the big one)...")
+    print_info("Detecting GPU support...")
+
+    # Check for NVIDIA GPU
+    has_nvidia = False
+    cuda_version = None
     try:
-        subprocess.check_call([
-            str(venv_python), "-m", "pip", "install",
-            "torch", "--index-url", "https://download.pytorch.org/whl/cpu"
-        ])
-        print_success("PyTorch installed!")
+        result = subprocess.run(["nvidia-smi"], capture_output=True, text=True)
+        if result.returncode == 0:
+            has_nvidia = True
+            # Try to extract CUDA version
+            for line in result.stdout.split('\n'):
+                if 'CUDA Version' in line:
+                    parts = line.split('CUDA Version:')
+                    if len(parts) > 1:
+                        version_str = parts[1].strip().split()[0]
+                        try:
+                            major = int(float(version_str))
+                            cuda_version = major
+                        except:
+                            pass
     except:
-        print_warning("PyTorch installation had issues, trying alternate method...")
-        subprocess.check_call([str(venv_python), "-m", "pip", "install", "torch"])
+        pass
+
+    is_windows = platform.system() == "Windows"
+
+    if has_nvidia:
+        print_success(f"NVIDIA GPU detected! Installing PyTorch with CUDA support...")
+        if cuda_version:
+            print_info(f"Detected CUDA {cuda_version}.x")
+
+        # Choose correct PyTorch version
+        if cuda_version == 12:
+            pytorch_url = "https://download.pytorch.org/whl/cu121"
+        elif cuda_version == 11:
+            pytorch_url = "https://download.pytorch.org/whl/cu118"
+        else:
+            # Default to CUDA 12.1
+            pytorch_url = "https://download.pytorch.org/whl/cu121"
+
+        # Windows needs --extra-index-url, Linux can use --index-url
+        index_flag = "--extra-index-url" if is_windows else "--index-url"
+
+        try:
+            subprocess.check_call([
+                str(venv_python), "-m", "pip", "install",
+                "torch", "torchvision", "torchaudio", index_flag, pytorch_url
+            ])
+            print_success("PyTorch with CUDA installed!")
+        except:
+            print_warning("CUDA install failed, trying default PyTorch...")
+            subprocess.check_call([str(venv_python), "-m", "pip", "install",
+                                 "torch", "torchvision", "torchaudio"])
+    else:
+        print_warning("No NVIDIA GPU detected, installing CPU-only PyTorch...")
+        print_info("This is fine for testing, but will be slower")
+        try:
+            subprocess.check_call([
+                str(venv_python), "-m", "pip", "install",
+                "torch", "torchvision", "torchaudio"
+            ])
+            print_success("PyTorch (CPU) installed!")
+        except:
+            print_error("PyTorch installation failed!")
+            print_info("Try manually: pip install torch torchvision torchaudio")
+            return False
 
     # Install other requirements
     print_info("\n📦 Installing other dependencies...")

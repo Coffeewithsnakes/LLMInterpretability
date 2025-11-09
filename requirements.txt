@@ -1,7 +1,16 @@
+# ⚠️  IMPORTANT: Install PyTorch FIRST before running this!
+# PyTorch installation depends on your system (CUDA version, etc.)
+# See PYTORCH_INSTALL.md for detailed instructions.
+#
+# Quick install for CUDA 12.x:
+#   pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+#
+# Or run the diagnostic tool:
+#   python cuda_diagnostic.py
+
 # Core interpretability libraries
 transformer-lens>=2.0.0
 sae-lens>=4.0.0
-torch>=2.0.0
 transformers>=4.30.0
 
 # Data handling and numerical computation

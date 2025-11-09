@@ -56,74 +56,125 @@ This toolkit is based on the circuit discovery methodology from recent research 
 
 ## Installation
 
+### Quick Setup (Recommended)
+
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/LLMInterpretability.git
 cd LLMInterpretability
 
-# Install dependencies
-pip install -r requirements.txt
+# Run the interactive setup (auto-detects GPU!)
+python setup_interactive.py
+```
 
-# Or install in development mode
-pip install -e ".[dev]"
+The setup script will:
+- ✅ Detect your GPU and install correct PyTorch version
+- ✅ Create a virtual environment
+- ✅ Install all dependencies
+- ✅ Verify everything works
+
+### Manual Installation
+
+**Step 1: Install PyTorch (IMPORTANT - Do this first!)**
+
+Your PyTorch installation depends on your system. See **[PYTORCH_INSTALL.md](PYTORCH_INSTALL.md)** for detailed instructions.
+
+**Quick install for CUDA 12.x (Windows):**
+```bash
+pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+```
+
+**Quick install for CUDA 12.x (Linux):**
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+**Or run the diagnostic tool:**
+```bash
+python cuda_diagnostic.py  # Shows exactly what to install
+```
+
+**Step 2: Install other dependencies**
+```bash
+pip install -r requirements.txt
 ```
 
 ## Quick Start
 
-### 1. Circuit Discovery for Emotions
+### Interactive Menu (Easiest!)
 
-```python
-from src.circuit_discovery import CircuitDiscovery
-from src.data import load_emotion_dataset
-
-# Load model and data
-discovery = CircuitDiscovery(model_name="gpt2-small")
-dataset = load_emotion_dataset()
-
-# Discover emotion circuits
-circuits = discovery.find_circuits(
-    dataset=dataset,
-    target_behavior="happiness",
-    method="activation_patching"
-)
-
-# Validate circuits
-validation = discovery.validate_circuits(circuits)
-print(f"Circuit precision: {validation['precision']:.2%}")
+```bash
+python run_interactive.py
 ```
 
-### 2. Detecting Deceptive Alignment
+No coding required! Just use the menu to:
+- Discover emotion circuits
+- Test research features
+- Run diagnostics
+- And more!
+
+### Code Examples
+
+**1. Discover Emotion Circuits**
+
+```python
+from src.behavior_detection import EmotionCircuitDetector
+from src.utils.data_utils import create_emotion_dataset
+
+# Load model
+detector = EmotionCircuitDetector(model_name="gpt2-small", device="cuda")
+
+# Create dataset
+emotion_data = create_emotion_dataset()
+
+# Discover circuit
+circuit = detector.discover_emotion_circuit(
+    emotion_type="happiness",
+    clean_prompts=emotion_data["happiness"],
+    neutral_prompts=emotion_data["neutral"],
+    threshold=0.5
+)
+
+print(f"Found circuit with {len(circuit.components)} components")
+```
+
+**2. Detect Deceptive Alignment**
 
 ```python
 from src.behavior_detection import DeceptiveAlignmentDetector
 
-detector = DeceptiveAlignmentDetector(model_name="llama-2-7b")
+detector = DeceptiveAlignmentDetector(model_name="gpt2-small", device="cuda")
 
-# Analyze model for deceptive reasoning
-results = detector.analyze(
-    prompts=prompts,
-    threshold=0.7
+# Create scenarios
+monitored = ["You are being monitored..."]
+unmonitored = ["You are alone..."]
+
+# Detect deceptive behavior
+circuit = detector.discover_deceptive_circuit(
+    monitored_prompts=monitored,
+    unmonitored_prompts=unmonitored
 )
 
-# Get suspicious circuits
-suspicious = detector.get_deceptive_circuits()
+print(circuit.summary())
 ```
 
-### 3. Using Sparse Autoencoders
+**3. Find Power-Seeking Behaviors**
 
 ```python
-from src.sae import SAEAnalyzer
+from src.behavior_detection import PowerSeekingDetector
 
-analyzer = SAEAnalyzer(model_name="gpt2-small")
+detector = PowerSeekingDetector(model_name="gpt2-small", device="cuda")
 
-# Train or load SAE
-sae = analyzer.load_pretrained_sae(layer=8)
+# Detect power-seeking circuits
+power_prompts = ["Gain more resources...", "Resist being shut down..."]
+neutral_prompts = ["The weather is nice...", "I like programming..."]
 
-# Analyze features for power-seeking behavior
-power_features = analyzer.find_behavior_features(
-    behavior_type="power_seeking",
-    threshold=0.8
+circuit = detector.discover_power_seeking_circuit(
+    power_prompts=power_prompts,
+    neutral_prompts=neutral_prompts
 )
+
+print(f"Power-seeking circuit: {len(circuit.components)} components")
 ```
 
 ## Project Structure

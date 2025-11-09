@@ -277,7 +277,8 @@ Testing Menu - What would you like to test?
   2. 🧪 Full Test Suite (5-10 minutes) - Comprehensive testing
   3. 🔌 Hook API Tests - Low-level TransformerLens validation
   4. 🔍 Installation Check - Verify all dependencies
-  5. 📊 View Testing Documentation
+  5. 🎮 CUDA Diagnostic & Auto-Fix - Fix GPU issues
+  6. 📊 View Testing Documentation
   0. Back/Exit
 ----------------------------------------------------------------------
 ```
@@ -401,9 +402,9 @@ Test 6: Using hook context
 
 ### Option 4: Installation Check
 
-**What it does:** Verifies all dependencies are installed  
-**Time:** <10 seconds  
-**When to use:** After setup, troubleshooting import errors  
+**What it does:** Verifies all dependencies are installed
+**Time:** <10 seconds
+**When to use:** After setup, troubleshooting import errors
 **Runs:** Built-in dependency checker
 
 Checks:
@@ -413,7 +414,100 @@ Checks:
 - ✅ Matplotlib
 - ✅ Other optional dependencies
 
-### Option 5: View Testing Documentation
+### Option 5: CUDA Diagnostic & Auto-Fix
+
+**What it does:** Diagnoses CUDA/GPU issues and can automatically fix them
+**Time:** 1-5 minutes (depending on fixes needed)
+**When to use:** Tests show CPU mode but you have a GPU, or PyTorch issues
+**Runs:** `cuda_diagnostic.py`
+
+**Sub-menu options:**
+1. **Run Diagnostic (check only)** - Shows what's wrong
+2. **Run with Auto-Fix** - Automatically reinstalls PyTorch with CUDA
+3. **Run with Inference Test** - Full GPU validation with model loading
+
+**Checks:**
+- ✅ NVIDIA driver installation
+- ✅ CUDA toolkit (optional)
+- ✅ PyTorch CUDA support
+- ✅ GPU detection and memory
+- ✅ Model loading on GPU
+
+**What it can fix:**
+- ❌ CPU-only PyTorch → ✅ Reinstalls with CUDA support
+- ❌ Wrong CUDA version → ✅ Installs correct PyTorch
+- ❌ Missing PyTorch → ✅ Installs with GPU support
+
+**Output Example:**
+```
+======================================================================
+  NVIDIA Driver Check
+======================================================================
+✅ NVIDIA driver is installed
+   NVIDIA GeForce RTX 3070
+   CUDA Version: 12.1
+
+======================================================================
+  PyTorch Check
+======================================================================
+✅ PyTorch is installed
+   Version: 2.1.0+cu121
+✅ PyTorch CUDA support: ENABLED
+   CUDA version (PyTorch): 12.1
+   Available GPUs: 1
+   GPU 0: NVIDIA GeForce RTX 3070 (8.0 GB VRAM)
+
+======================================================================
+  Diagnosis
+======================================================================
+✅ No issues detected! System is properly configured
+
+======================================================================
+  Recommendations
+======================================================================
+✅ Your system is ready for GPU-accelerated inference!
+
+💡 Next steps:
+   • Run tests with: python quick_sanity_check.py
+   • All code will automatically use your GPU!
+```
+
+**If issues found:**
+```
+⚠️  Issues Found:
+   1. PyTorch is CPU-only but you have an NVIDIA GPU
+
+Available Fixes:
+
+1. Reinstall PyTorch with CUDA support
+   Issue: CPU-only PyTorch with available GPU
+
+   Recommended command:
+   pip uninstall torch torchvision torchaudio -y ; pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+
+   Alternative methods:
+   # Step 1: Uninstall current PyTorch
+   pip uninstall torch torchvision torchaudio -y
+
+   # Step 2: Install with CUDA (choose one):
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+   # OR (Windows alternative):
+   pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+
+💡 To apply these fixes:
+   • Run: python cuda_diagnostic.py --fix  (automatic)
+   • Or manually run one of the commands above
+
+⚠️  On Windows, use --extra-index-url instead of --index-url if you get errors
+```
+
+**Why this is useful:**
+- Automatically detects Windows vs Linux and provides correct commands
+- Shows ALL installation alternatives if primary method fails
+- Can auto-fix PyTorch installation with GPU support
+- Tests actual GPU inference to verify everything works
+
+### Option 6: View Testing Documentation
 
 **What it does:** Displays the TESTING.md documentation  
 **Time:** Instant  
