@@ -251,7 +251,9 @@ class EmotionCircuitDetector:
         self,
         circuit: Circuit,
         prompts: List[str],
-        intensity: float = 1.0
+        intensity: float = 1.0,
+        use_smart_bounds: bool = True,
+        intervention_type: str = "multiplicative"
     ) -> List[str]:
         """
         Control emotion expression by modulating circuit activations.
@@ -264,16 +266,37 @@ class EmotionCircuitDetector:
             circuit: Emotion circuit to modulate
             prompts: Input prompts
             intensity: Modulation intensity (>1 amplifies, <1 dampens, 0 removes)
+            use_smart_bounds: If True, clamps interventions to prevent collapse
+            intervention_type: "multiplicative" or "additive"
 
         Returns:
             Generated text with modulated emotion
         """
         inputs = self.model.to_tokens(prompts)
 
-        # Create modulation hook that multiplies activations by intensity
-        def modulation_hook(activation, hook):
-            """Multiply activation by intensity."""
-            return activation * intensity
+        # Create modulation hook
+        if intervention_type == "additive":
+            # Additive: add scaled activation (more stable for large changes)
+            def modulation_hook(activation, hook):
+                """Add intensity-scaled activation."""
+                scaled_delta = activation * (intensity - 1.0)
+                if use_smart_bounds:
+                    # Limit change to ±2 std devs to prevent collapse
+                    std = activation.std()
+                    scaled_delta = torch.clamp(scaled_delta, -2*std, 2*std)
+                return activation + scaled_delta
+        else:
+            # Multiplicative: multiply activation (original method)
+            def modulation_hook(activation, hook):
+                """Multiply activation by intensity."""
+                result = activation * intensity
+                if use_smart_bounds:
+                    # Clamp to reasonable range based on original distribution
+                    mean = activation.mean()
+                    std = activation.std()
+                    # Allow ±3 std devs from mean (99.7% of normal distribution)
+                    result = torch.clamp(result, mean - 3*std, mean + 3*std)
+                return result
 
         # Create list of (component_name, hook_function) tuples for all circuit components
         hook_list = [(component, modulation_hook) for component in circuit.components]

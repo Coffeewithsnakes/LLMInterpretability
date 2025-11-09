@@ -204,13 +204,15 @@ def emotion_circuits_wizard():
 
         print(f"\n📝 Test prompt: '{test_prompt}'")
         print("\n⏳ Generating with different intensities...")
+        print("   (Using smart bounds to prevent model collapse)")
 
         results = {}
-        for intensity_name, intensity_val in [("Normal", 1.0), ("Amplified", 2.0), ("Dampened", 0.5)]:
+        for intensity_name, intensity_val in [("Normal", 1.0), ("Amplified", 1.5), ("Dampened", 0.7)]:
             outputs = detector.modulate_emotion(
                 circuit,
                 [test_prompt],
-                intensity=intensity_val
+                intensity=intensity_val,
+                use_smart_bounds=True  # Prevent extreme interventions
             )
             results[intensity_name] = outputs[0]
 
@@ -579,14 +581,23 @@ def quick_demo():
             print("   This is OK for a demo - try the full version with more examples!")
         else:
             print("\n⏳ Testing emotion control...")
+            print("   (Using smart bounds to maintain coherence)")
             test_prompt = ["I just got the news. I feel"]
 
-            normal = detector.modulate_emotion(circuit, test_prompt, intensity=1.0)
-            amplified = detector.modulate_emotion(circuit, test_prompt, intensity=2.0)
+            normal = detector.modulate_emotion(
+                circuit, test_prompt,
+                intensity=1.0,
+                use_smart_bounds=True
+            )
+            amplified = detector.modulate_emotion(
+                circuit, test_prompt,
+                intensity=1.5,  # Reduced from 2.0 for better coherence
+                use_smart_bounds=True
+            )
 
             print("\n📊 Results:")
             print(f"\nNormal: {normal[0][:100]}...")
-            print(f"\nAmplified (2x happiness): {amplified[0][:100]}...")
+            print(f"\nAmplified (1.5x happiness): {amplified[0][:100]}...")
 
         show_success("\n✅ Demo complete! You can now see how circuit modulation works.")
         print("\nℹ️  For better results, try the full 'Emotion Circuits' option with more examples!")
