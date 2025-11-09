@@ -80,13 +80,13 @@ def main_menu():
 
     options = [
         "🎭 Discover Emotion Circuits (Beginner-Friendly)",
-        "🎭 Detect Deceptive Alignment",
+        "🕵️  Detect Deceptive Alignment",
         "⚡ Find Power-Seeking Behaviors",
-        "🔧 Quick Demo (3 minutes)",
+        "🚀 Quick Demo (3 minutes)",
         "📚 Open Tutorial Notebooks",
         "🌐 Launch Web Interface",
-        "ℹ️  Help & Documentation",
-        "🔍 Check Installation"
+        "🧪 Testing & Diagnostics",
+        "ℹ️  Help & Documentation"
     ]
 
     choice = print_menu("Main Menu - What would you like to do?", options)
@@ -104,9 +104,9 @@ def main_menu():
     elif choice == 6:
         launch_web_interface()
     elif choice == 7:
-        show_help()
+        testing_menu()
     elif choice == 8:
-        check_installation()
+        show_help()
     elif choice == 0:
         print("\n👋 Goodbye! Thanks for using the toolkit!")
         sys.exit(0)
@@ -739,6 +739,184 @@ def check_installation():
 
     wait_for_user()
     main_menu()
+
+
+def testing_menu():
+    """Show testing and diagnostics menu."""
+    print_header()
+    print("🧪 TESTING & DIAGNOSTICS")
+    print()
+    print("These tools help you verify everything is working correctly.")
+    print("Run these if you're having issues or after making changes.")
+    print()
+
+    options = [
+        "⚡ Quick Sanity Check (30 seconds) - Test the bug fix",
+        "🧪 Full Test Suite (5-10 minutes) - Comprehensive testing",
+        "🔌 Hook API Tests - Low-level TransformerLens validation",
+        "🔍 Installation Check - Verify all dependencies",
+        "📊 View Testing Documentation"
+    ]
+
+    choice = print_menu("Testing Menu - What would you like to test?", options)
+
+    if choice == 1:
+        run_quick_sanity_check()
+    elif choice == 2:
+        run_full_test_suite()
+    elif choice == 3:
+        run_hook_tests()
+    elif choice == 4:
+        check_installation()
+    elif choice == 5:
+        view_testing_docs()
+    elif choice == 0:
+        main_menu()
+
+
+def run_quick_sanity_check():
+    """Run the quick sanity check."""
+    print_header()
+    print("⚡ QUICK SANITY CHECK")
+    print()
+    print("This runs a 30-second test to verify the hook bug fix works.")
+    print("It tests emotion modulation with different intensities.")
+    print()
+
+    wait_for_user()
+
+    print("\n🏃 Running quick sanity check...\n")
+    print("=" * 70)
+
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, "quick_sanity_check.py"],
+        capture_output=False
+    )
+
+    if result.returncode == 0:
+        show_success("\nQuick sanity check PASSED!")
+    else:
+        show_error("\nQuick sanity check FAILED!")
+        print("\nℹ️  Check the output above for details")
+
+    wait_for_user()
+    testing_menu()
+
+
+def run_full_test_suite():
+    """Run the comprehensive test suite."""
+    print_header()
+    print("🧪 FULL TEST SUITE")
+    print()
+    print("This runs comprehensive tests of all functionality.")
+    print("Tests include:")
+    print("  • All imports")
+    print("  • Model loading")
+    print("  • Hook API correctness")
+    print("  • Emotion circuit detection")
+    print("  • Deceptive alignment detection")
+    print("  • Power-seeking detection")
+    print()
+    print("⏱️  Expected time: 5-10 minutes (first run may take longer)")
+    print()
+
+    response = input("Ready to run? This will take a while. (y/n): ").lower().strip()
+    if response != 'y':
+        print("\nTest cancelled.")
+        wait_for_user()
+        testing_menu()
+        return
+
+    print("\n🧪 Running full test suite...\n")
+    print("=" * 70)
+
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, "tests/test_basic.py"],
+        capture_output=False
+    )
+
+    print("\n" + "=" * 70)
+
+    if result.returncode == 0:
+        show_success("\nAll tests PASSED! 🎉")
+    else:
+        show_error("\nSome tests FAILED!")
+        print("\nℹ️  Check the output above for details")
+
+    wait_for_user()
+    testing_menu()
+
+
+def run_hook_tests():
+    """Run TransformerLens hook API tests."""
+    print_header()
+    print("🔌 HOOK API TESTS")
+    print()
+    print("This tests the low-level TransformerLens hook API.")
+    print("It validates that we're using the API correctly.")
+    print()
+    print("Tests:")
+    print("  • run_with_hooks()")
+    print("  • hooks() context manager")
+    print("  • add_hook() and reset_hooks()")
+    print("  • Generation with hooks")
+    print()
+    print("⏱️  Expected time: ~1 minute")
+    print()
+
+    wait_for_user()
+
+    print("\n🔌 Running hook API tests...\n")
+    print("=" * 70)
+
+    import subprocess
+    result = subprocess.run(
+        [sys.executable, "test_hooks.py"],
+        capture_output=False
+    )
+
+    print("\n" + "=" * 70)
+
+    if result.returncode == 0:
+        show_success("\nHook API tests PASSED!")
+    else:
+        show_error("\nHook API tests FAILED!")
+        print("\nℹ️  Check the output above for details")
+
+    wait_for_user()
+    testing_menu()
+
+
+def view_testing_docs():
+    """View testing documentation."""
+    print_header()
+    print("📊 TESTING DOCUMENTATION")
+    print()
+
+    # Read and display TESTING.md
+    try:
+        with open("TESTING.md", "r") as f:
+            content = f.read()
+            # Show first 50 lines
+            lines = content.split('\n')[:50]
+            for line in lines:
+                print(line)
+
+            if len(content.split('\n')) > 50:
+                print("\n... (truncated, see TESTING.md for full documentation)")
+
+    except FileNotFoundError:
+        show_error("TESTING.md not found!")
+        print("\nℹ️  Testing documentation should be in the project root")
+
+    print("\n" + "=" * 70)
+    print("\n📖 For the full documentation, read TESTING.md in your text editor")
+    print("   or run: cat TESTING.md")
+
+    wait_for_user()
+    testing_menu()
 
 
 def main():
