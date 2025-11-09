@@ -275,25 +275,19 @@ class EmotionCircuitDetector:
             """Multiply activation by intensity."""
             return activation * intensity
 
-        # Add hooks to all circuit components
-        hook_handles = []
-        for component_name in circuit.components:
-            handle = self.model.add_hook(component_name, modulation_hook)
-            hook_handles.append(handle)
+        # Create list of (component_name, hook_function) tuples for all circuit components
+        hook_list = [(component, modulation_hook) for component in circuit.components]
 
-        try:
-            # Generate with modulated circuit
-            with torch.no_grad():
+        # Generate with modulated circuit using hooks context manager
+        # This is the correct way to temporarily add hooks in TransformerLens
+        with torch.no_grad():
+            with self.model.hooks(fwd_hooks=hook_list):
                 outputs = self.model.generate(
                     inputs,
                     max_new_tokens=50,
                     do_sample=True,
                     temperature=0.8
                 )
-        finally:
-            # Always remove hooks, even if generation fails
-            for handle in hook_handles:
-                handle.remove()
 
         # Decode outputs
         generated_texts = [
