@@ -1,5 +1,9 @@
 # LLM Interpretability Toolkit
 
+> **🚀 NEW USER? START HERE!** → [**START_HERE.md**](START_HERE.md) for step-by-step beginner guide!
+>
+> **⚡ Quick Setup:** Run `python setup_interactive.py` and follow the prompts!
+
 A comprehensive toolkit for mechanistic interpretability of large language models, with a focus on circuit discovery, behavior detection (deceptive alignment, power-seeking), and model steering.
 
 ## Overview
