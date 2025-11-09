@@ -987,6 +987,7 @@ def settings_menu():
     options = [
         "🔄 Change Model",
         "📊 View Model Information",
+        "💻 System Info (GPU/CUDA Status)",
         "🔙 Reset to Default (gpt2-small)"
     ]
 
@@ -997,6 +998,8 @@ def settings_menu():
     elif choice == 2:
         view_model_info()
     elif choice == 3:
+        view_system_info()
+    elif choice == 4:
         save_model_preference("gpt2-small")
         show_success("Reset to default model: gpt2-small")
         wait_for_user()
@@ -1168,6 +1171,144 @@ def view_model_info():
     print("    - Very coherent with interventions")
     print()
 
+    wait_for_user()
+    settings_menu()
+
+
+def view_system_info():
+    """Display system information including GPU/CUDA status."""
+    print_header()
+    print("💻 SYSTEM INFORMATION")
+    print()
+    print("=" * 70)
+    print()
+
+    # Import torch to check GPU
+    try:
+        import torch
+        torch_available = True
+    except ImportError:
+        torch_available = False
+        print("❌ PyTorch not installed!")
+        print()
+        wait_for_user()
+        settings_menu()
+        return
+
+    # Python version
+    import platform
+    print(f"🐍 Python: {platform.python_version()}")
+    print(f"💻 OS: {platform.system()} {platform.release()}")
+    print()
+
+    # PyTorch version
+    print(f"🔥 PyTorch: {torch.__version__}")
+    print()
+
+    # CUDA availability
+    print("=" * 70)
+    print("GPU/CUDA STATUS")
+    print("=" * 70)
+    print()
+
+    cuda_available = torch.cuda.is_available()
+
+    if cuda_available:
+        print("✅ CUDA Available: YES - Your GPU is being used! 🎉")
+        print()
+
+        # GPU details
+        try:
+            gpu_count = torch.cuda.device_count()
+            print(f"📊 Number of GPUs: {gpu_count}")
+            print()
+
+            for i in range(gpu_count):
+                print(f"GPU {i}:")
+                print(f"  • Name: {torch.cuda.get_device_name(i)}")
+
+                # Get memory info
+                total_memory = torch.cuda.get_device_properties(i).total_memory / 1024**3
+                print(f"  • Total VRAM: {total_memory:.2f} GB")
+
+                # Current memory usage
+                allocated = torch.cuda.memory_allocated(i) / 1024**3
+                reserved = torch.cuda.memory_reserved(i) / 1024**3
+                print(f"  • Currently Allocated: {allocated:.2f} GB")
+                print(f"  • Currently Reserved: {reserved:.2f} GB")
+                print(f"  • Available: {total_memory - reserved:.2f} GB")
+                print()
+
+            print(f"🎯 Default Device: cuda")
+            print()
+            print("✅ All features will use GPU acceleration by default!")
+
+        except Exception as e:
+            print(f"⚠️  Could not get GPU details: {e}")
+    else:
+        print("❌ CUDA Available: NO - Using CPU only")
+        print()
+        print("Possible reasons:")
+        print("  • No NVIDIA GPU detected")
+        print("  • CUDA drivers not installed")
+        print("  • PyTorch CPU-only version installed")
+        print()
+        print("🎯 Default Device: cpu")
+        print()
+        print("💡 To use GPU:")
+        print("   1. Install NVIDIA drivers for your GPU")
+        print("   2. Install CUDA toolkit")
+        print("   3. Reinstall PyTorch with CUDA support:")
+        print("      pip install torch --index-url https://download.pytorch.org/whl/cu118")
+
+    print()
+    print("=" * 70)
+    print("CURRENT CONFIGURATION")
+    print("=" * 70)
+    print()
+
+    current_model = get_current_model()
+    device = "cuda" if cuda_available else "cpu"
+
+    print(f"📦 Selected Model: {current_model}")
+    print(f"🎯 Device: {device}")
+    print()
+
+    # Estimate VRAM usage for current model
+    if cuda_available:
+        model_vram = {
+            "gpt2-small": "1-2 GB",
+            "gpt2-medium": "3-4 GB",
+            "gpt2-large": "5-6 GB",
+            "gpt2-xl": "7-8 GB",
+            "EleutherAI/pythia-1b": "4-5 GB",
+            "EleutherAI/pythia-1.4b": "5-6 GB"
+        }
+
+        estimated_vram = model_vram.get(current_model, "Unknown")
+        print(f"📊 Estimated VRAM for {current_model}: {estimated_vram}")
+
+        # Check if model will fit
+        if cuda_available and gpu_count > 0:
+            total_vram = torch.cuda.get_device_properties(0).total_memory / 1024**3
+            max_vram_needed = {
+                "gpt2-small": 2,
+                "gpt2-medium": 4,
+                "gpt2-large": 6,
+                "gpt2-xl": 8,
+                "EleutherAI/pythia-1b": 5,
+                "EleutherAI/pythia-1.4b": 6
+            }
+
+            needed = max_vram_needed.get(current_model, 0)
+            if needed > 0:
+                if needed <= total_vram:
+                    print(f"✅ Model will fit! ({needed}GB needed, {total_vram:.1f}GB available)")
+                else:
+                    print(f"⚠️  Model might not fit! ({needed}GB needed, {total_vram:.1f}GB available)")
+
+    print()
+    print("=" * 70)
     wait_for_user()
     settings_menu()
 
