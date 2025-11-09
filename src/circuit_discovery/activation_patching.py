@@ -200,7 +200,11 @@ class ActivationPatcher:
             else:
                 effect = 0.0
 
-            patching_effects[component_name] = effect.item()
+            # Handle both tensor and float returns from metric functions
+            if isinstance(effect, torch.Tensor):
+                patching_effects[component_name] = effect.item()
+            else:
+                patching_effects[component_name] = float(effect)
 
         return patching_effects
 
