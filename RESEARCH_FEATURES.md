@@ -252,20 +252,30 @@ BENCHMARK vs PAPER RESULTS
 
 ## 🚀 Quick Start Guide
 
-### 1. Simple Demo (Basic Method)
+### 1. Interactive Menu (Recommended!)
 ```bash
 python run_interactive.py
-# Choose: Quick Demo
+# Select: "🔬 Research: Reproduce Paper Results"
+# Then choose:
+#   - Single Emotion Reproduction (10-15 min)
+#   - Full Paper: All 6 Emotions (60-90 min)
+#   - Quick Research Demo (5 min)
 ```
 
-### 2. Research-Grade (Advanced Method)
+### 2. Command Line - Single Emotion
 ```bash
 python reproduce_paper.py --emotion happiness --model gpt2-medium
 ```
 
-### 3. Full Paper Reproduction
+### 3. Command Line - Full Paper
 ```bash
 python reproduce_paper.py --all --model EleutherAI/pythia-1b
+```
+
+### 4. Simple Demo (Basic Method)
+```bash
+python run_interactive.py
+# Choose: "🚀 Quick Demo (3 minutes)"
 ```
 
 ---

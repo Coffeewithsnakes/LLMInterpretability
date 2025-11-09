@@ -12,6 +12,15 @@ A comprehensive toolkit for mechanistic interpretability of large language model
 
 **Reproduce "Do LLMs 'Feel'?" Paper Results (99.65% accuracy)**
 
+### Interactive Menu (Easiest!)
+
+```bash
+python run_interactive.py
+# Select: "🔬 Research: Reproduce Paper Results"
+```
+
+**OR use command line:**
+
 ```bash
 # Single emotion reproduction
 python reproduce_paper.py --emotion happiness --model gpt2-medium
@@ -26,7 +35,8 @@ python reproduce_paper.py --all --model EleutherAI/pythia-1b
 - ✅ 99%+ accuracy validation metrics
 - ✅ Advanced circuit discovery (392 MLP + 168 attention components)
 - ✅ Comprehensive benchmarking against paper
-- ✅ Support for GPT-2, Pythia, and other models
+- ✅ Support for GPT-2, Pythia, Llama, and other models
+- ✅ **NEW:** Interactive menu - no command line needed!
 
 **See [RESEARCH_FEATURES.md](RESEARCH_FEATURES.md) for complete documentation.**
 

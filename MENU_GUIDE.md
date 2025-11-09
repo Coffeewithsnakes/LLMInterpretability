@@ -23,17 +23,243 @@ Main Menu - What would you like to do?
   2. 🕵️  Detect Deceptive Alignment
   3. ⚡ Find Power-Seeking Behaviors
   4. 🚀 Quick Demo (3 minutes)
-  5. 📚 Open Tutorial Notebooks
-  6. 🌐 Launch Web Interface
-  7. 🧪 Testing & Diagnostics
-  8. ℹ️  Help & Documentation
+  5. 🔬 Research: Reproduce Paper Results (99%+ Accuracy)
+  6. 📚 Open Tutorial Notebooks
+  7. 🌐 Launch Web Interface
+  8. 🧪 Testing & Diagnostics
+  9. ⚙️  Settings (Change Model)
+  10. ℹ️  Help & Documentation
   0. Back/Exit
 ----------------------------------------------------------------------
 ```
 
-## Testing & Diagnostics Menu (Option 7)
+## Research Menu (Option 5)
 
-Choose option **7** from the main menu to access:
+Choose option **5** from the main menu to access research-grade paper reproduction:
+
+```
+======================================================================
+  🔍 LLM Interpretability Toolkit - Interactive Menu
+======================================================================
+
+🔬 RESEARCH: REPRODUCE PAPER RESULTS
+
+Reproduce findings from 'Do LLMs Feel?' (arxiv.org/abs/2510.11328)
+Target: 99.65% emotion control accuracy
+
+This uses advanced 7-stage pipeline with:
+  • 600+ carefully crafted emotion prompts
+  • 392 MLP neurons + 168 attention heads
+  • Validation against paper benchmarks
+
+What would you like to do?
+----------------------------------------------------------------------
+  1. 🎯 Single Emotion Reproduction (10-15 min)
+  2. 🎨 Full Paper: All 6 Emotions (60-90 min)
+  3. ⚡ Quick Research Demo (5 min)
+  4. 📄 View Research Documentation
+  5. 🔄 Back to Main Menu
+  0. Back/Exit
+----------------------------------------------------------------------
+```
+
+### Option 1: Single Emotion Reproduction
+
+**What it does:** Runs the complete 7-stage pipeline for one emotion
+**Time:** 10-15 minutes
+**When to use:** Testing research features, reproducing specific emotion
+**Target accuracy:** 99%+
+
+**Seven-Stage Pipeline:**
+1. Prompt-based emotion elicitation (50 emotion + 50 neutral prompts)
+2. Emotion direction extraction from residual streams
+3. Steering-based generation validation
+4. Local component identification (392 MLP neurons + 168 attention heads)
+5. Emotion difference vector computation
+6. Global circuit integration
+7. Circuit-based emotion generation
+
+**Emotions available:**
+- Happiness
+- Sadness
+- Anger
+- Fear
+- Disgust
+- Surprise
+
+**Output Example:**
+```
+🎉 REPRODUCTION COMPLETE!
+✅ Circuit discovered: 24 components
+✅ Validation accuracy: 99.20%
+
+📊 Benchmark vs Paper:
+   Our accuracy:   99.20%
+   Paper accuracy: 99.41%
+   Difference:     -0.21%
+   Status:         EXCELLENT
+
+📝 Sample Generated Texts:
+1. I feel absolutely wonderful today! Everything is going so well...
+2. This is such a joyful moment, I can't help but smile...
+3. What an amazing experience! I'm filled with happiness...
+
+💾 Results saved to: results_happiness_gpt2-medium.txt
+```
+
+### Option 2: Full Paper Reproduction
+
+**What it does:** Reproduces all 6 emotions from the paper
+**Time:** 60-90 minutes
+**When to use:** Complete validation, research publication
+**Target accuracy:** 99%+ across all emotions
+
+**Processes:**
+- Happiness, Sadness, Anger, Fear, Disgust, Surprise
+- 30 prompts per emotion (faster) or 50 for max accuracy
+- Individual validation for each emotion
+- Overall benchmark report
+
+**Output Example:**
+```
+🎉 FULL PAPER REPRODUCTION COMPLETE!
+
+HAPPINESS:
+  Accuracy: 99.20%
+  Components: 24
+  Status: EXCELLENT
+
+SADNESS:
+  Accuracy: 98.85%
+  Components: 22
+  Status: EXCELLENT
+
+[... results for all 6 emotions ...]
+
+💾 Comprehensive results saved to: full_reproduction_gpt2-medium.txt
+```
+
+### Option 3: Quick Research Demo
+
+**What it does:** Fast demo with reduced parameters
+**Time:** ~5 minutes
+**When to use:** Quick validation, learning the system
+**Parameters:** 20 prompts, 200 MLP neurons, 100 attention heads
+
+**Trade-off:**
+- ✅ Fast to run
+- ✅ Shows full pipeline
+- ⚠️  Lower accuracy than full reproduction (~85-95%)
+
+### Option 4: View Research Documentation
+
+**What it does:** Displays research documentation overview
+**Time:** Instant
+**Shows:**
+- RESEARCH_FEATURES.md overview
+- Command-line script usage
+- Model recommendations
+- Paper link and key concepts
+
+### Model Recommendations
+
+The research menu shows model quality ratings:
+
+**EXCELLENT Models:**
+- ✅ Llama-3.2-3B (paper's model) - 99.65% target
+- ✅ Pythia-1B / Pythia-1.4B - Research-grade
+- ✅ GPT-2 Large / XL - 95-99% accuracy
+
+**GOOD Models:**
+- ⚠️  GPT-2 Medium - 90-95% accuracy (still useful)
+
+**Not Recommended:**
+- ❌ GPT-2 Small - Too small for research-grade results
+
+**Tip:** Use Settings menu (Option 9) to change your model!
+
+## Settings Menu (Option 9)
+
+Choose option **9** to configure your model and view system info:
+
+```
+⚙️  SETTINGS
+
+Current model: gpt2-medium
+
+Settings Menu
+----------------------------------------------------------------------
+  1. 🔄 Change Model
+  2. 📊 View Model Information
+  3. 💻 System Info (GPU/CUDA Status)
+  0. Back/Exit
+----------------------------------------------------------------------
+```
+
+### Option 1: Change Model
+
+**Interactive model selector** with full specifications:
+
+```
+Available models (sorted by size):
+
+[1] gpt2-small (124M) - Fast & Light
+    VRAM: 2-3GB | Speed: ⚡⚡⚡ | Quality: ⭐⭐
+    Best for: Quick testing and demos
+
+[2] gpt2-medium (355M) - Balanced ⭐
+    VRAM: 3-4GB | Speed: ⚡⚡ | Quality: ⭐⭐⭐
+    Best for: Most use cases, 3070 sweet spot
+
+[3] gpt2-large (774M) - High Quality
+    VRAM: 5-6GB | Speed: ⚡ | Quality: ⭐⭐⭐⭐
+    Best for: Research-grade results
+
+[... more models ...]
+
+[7] Llama-3.2-3B - PAPER'S MODEL ⭐⭐
+    VRAM: 6-7GB | Speed: ⚡ | Quality: ⭐⭐⭐⭐⭐
+    Best for: 99.65% accuracy (requires HF token)
+
+Your GPU: NVIDIA GeForce RTX 3070 (8GB VRAM)
+```
+
+**Features:**
+- No memorization needed - all specs shown
+- GPU compatibility warnings
+- Saves preference to `.model_config`
+- Used by all features automatically
+
+### Option 3: System Info
+
+**View GPU/CUDA status:**
+
+```
+💻 SYSTEM INFORMATION
+
+🖥️  Platform: Linux
+📦 Python: 3.10.12
+
+CUDA & GPU Status:
+  ✅ CUDA Available: Yes
+  ✅ CUDA Version: 12.1
+  ✅ GPU Count: 1
+
+  GPU 0: NVIDIA GeForce RTX 3070
+    • Total VRAM: 8.00 GB
+    • VRAM Used: 0.45 GB
+    • VRAM Free: 7.55 GB
+    • Utilization: 5%
+
+Model Compatibility:
+  ✅ gpt2-small will fit! (2GB needed, 8.0GB available)
+  ✅ gpt2-medium will fit! (4GB needed, 8.0GB available)
+  ✅ gpt2-large will fit! (6GB needed, 8.0GB available)
+```
+
+## Testing & Diagnostics Menu (Option 8)
+
+Choose option **8** from the main menu to access:
 
 ```
 ======================================================================
@@ -196,31 +422,59 @@ Checks:
 
 ## Quick Navigation
 
+### I want to reproduce the research paper:
+```
+python run_interactive.py
+→ Option 5 (Research: Reproduce Paper Results)
+→ Option 1 (Single Emotion) or Option 2 (Full Paper)
+```
+
+### I want to test research features quickly:
+```
+python run_interactive.py
+→ Option 5 (Research: Reproduce Paper Results)
+→ Option 3 (Quick Research Demo)
+```
+
+### I want to change my model:
+```
+python run_interactive.py
+→ Option 9 (Settings)
+→ Option 1 (Change Model)
+```
+
+### I want to check if I'm using my GPU:
+```
+python run_interactive.py
+→ Option 9 (Settings)
+→ Option 3 (System Info)
+```
+
 ### I just installed, want to verify it works:
 ```
 python run_interactive.py
-→ Option 7 (Testing & Diagnostics)
+→ Option 8 (Testing & Diagnostics)
 → Option 1 (Quick Sanity Check)
 ```
 
 ### I made changes and want to test thoroughly:
 ```
 python run_interactive.py
-→ Option 7 (Testing & Diagnostics)
+→ Option 8 (Testing & Diagnostics)
 → Option 2 (Full Test Suite)
 ```
 
 ### I'm getting hook-related errors:
 ```
 python run_interactive.py
-→ Option 7 (Testing & Diagnostics)
+→ Option 8 (Testing & Diagnostics)
 → Option 3 (Hook API Tests)
 ```
 
 ### I'm getting import errors:
 ```
 python run_interactive.py
-→ Option 7 (Testing & Diagnostics)
+→ Option 8 (Testing & Diagnostics)
 → Option 4 (Installation Check)
 ```
 
