@@ -3,8 +3,32 @@
 > **🚀 NEW USER? START HERE!** → [**START_HERE.md**](START_HERE.md) for step-by-step beginner guide!
 >
 > **⚡ Quick Setup:** Run `python setup_interactive.py` and follow the prompts!
+>
+> **🔬 RESEARCHERS:** See [**RESEARCH_FEATURES.md**](RESEARCH_FEATURES.md) for advanced features & paper reproduction!
 
 A comprehensive toolkit for mechanistic interpretability of large language models, with a focus on circuit discovery, behavior detection (deceptive alignment, power-seeking), and model steering.
+
+## 🎉 NEW: Research-Grade Features
+
+**Reproduce "Do LLMs 'Feel'?" Paper Results (99.65% accuracy)**
+
+```bash
+# Single emotion reproduction
+python reproduce_paper.py --emotion happiness --model gpt2-medium
+
+# Full paper reproduction (all 6 emotions)
+python reproduce_paper.py --all --model EleutherAI/pythia-1b
+```
+
+**Features:**
+- ✅ 600+ high-quality emotion prompts (6 emotions × 100 prompts)
+- ✅ Seven-stage pipeline matching paper methodology
+- ✅ 99%+ accuracy validation metrics
+- ✅ Advanced circuit discovery (392 MLP + 168 attention components)
+- ✅ Comprehensive benchmarking against paper
+- ✅ Support for GPT-2, Pythia, and other models
+
+**See [RESEARCH_FEATURES.md](RESEARCH_FEATURES.md) for complete documentation.**
 
 ## Overview
 
