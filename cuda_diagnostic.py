@@ -128,29 +128,91 @@ def diagnose_issues(pytorch_status, pytorch_type, has_nvidia):
     issues = []
     fixes = []
 
+    # Detect platform for correct install commands
+    import platform
+    is_windows = platform.system() == "Windows"
+
+    # Get CUDA version from nvidia-smi if available
+    cuda_version = None
+    code, stdout, _ = run_command("nvidia-smi")
+    if code == 0:
+        for line in stdout.split('\n'):
+            if 'CUDA Version' in line:
+                # Extract version like "12.1" from "CUDA Version: 12.1"
+                parts = line.split('CUDA Version:')
+                if len(parts) > 1:
+                    version_str = parts[1].strip().split()[0]
+                    try:
+                        major = int(float(version_str))
+                        cuda_version = major
+                    except:
+                        pass
+
     if not pytorch_status:
         issues.append("PyTorch is not installed")
+
+        # Provide multiple installation options
+        if cuda_version == 12:
+            fix_cmd = "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121"
+        elif cuda_version == 11:
+            fix_cmd = "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118"
+        else:
+            # Default to latest stable with CUDA
+            fix_cmd = "pip install torch torchvision torchaudio"
+
         fixes.append({
             "issue": "PyTorch missing",
-            "fix": "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121",
-            "description": "Install PyTorch with CUDA 12.1 support"
+            "fix": fix_cmd,
+            "description": "Install PyTorch with CUDA support",
+            "alternatives": [
+                "# Alternative 1 (Official, recommended):",
+                "pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121",
+                "",
+                "# Alternative 2 (CUDA 11.8):",
+                "pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118",
+                "",
+                "# Alternative 3 (Latest stable):",
+                "pip3 install torch torchvision torchaudio",
+                "",
+                "# Windows-specific (if above fails):",
+                "pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121"
+            ]
         })
+
     elif pytorch_type == "cpu-only" and has_nvidia:
         issues.append("PyTorch is CPU-only but you have an NVIDIA GPU")
+
+        if is_windows:
+            fix_cmd = "pip uninstall torch torchvision torchaudio -y ; pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121"
+        else:
+            fix_cmd = "pip uninstall torch torchvision torchaudio -y && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121"
+
         fixes.append({
             "issue": "CPU-only PyTorch with available GPU",
-            "fix": "pip uninstall torch torchvision torchaudio -y && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121",
-            "description": "Reinstall PyTorch with CUDA support"
+            "fix": fix_cmd,
+            "description": "Reinstall PyTorch with CUDA support",
+            "alternatives": [
+                "# Step 1: Uninstall current PyTorch",
+                "pip uninstall torch torchvision torchaudio -y",
+                "",
+                "# Step 2: Install with CUDA (choose one):",
+                "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121",
+                "# OR (Windows alternative):",
+                "pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121",
+                "# OR (CUDA 11.8):",
+                "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118"
+            ]
         })
+
     elif pytorch_type == "cpu-only" and not has_nvidia:
         issues.append("No NVIDIA GPU detected - CPU-only mode is expected")
         print_check("Using CPU is normal for your system", True)
 
-    if issues:
+    if issues and fixes:
         print("\n⚠️  Issues Found:")
         for i, issue in enumerate(issues, 1):
             print(f"   {i}. {issue}")
-    else:
+    elif not issues:
         print_check("No issues detected! System is properly configured", True)
 
     return fixes
@@ -165,7 +227,14 @@ def apply_fixes(fixes, auto=False):
     for i, fix in enumerate(fixes, 1):
         print(f"\n{i}. {fix['description']}")
         print(f"   Issue: {fix['issue']}")
-        print(f"   Command: {fix['fix']}")
+        print(f"\n   Recommended command:")
+        print(f"   {fix['fix']}")
+
+        # Show alternatives if available
+        if 'alternatives' in fix and fix['alternatives']:
+            print(f"\n   Alternative methods:")
+            for alt in fix['alternatives']:
+                print(f"   {alt}")
 
     print("\n" + "=" * 70)
 
@@ -180,10 +249,12 @@ def apply_fixes(fixes, auto=False):
                 print_check(f"Fix failed", False)
                 if stderr:
                     print(f"   Error: {stderr}")
+                print("\n💡 If auto-fix failed, try the alternative methods shown above manually")
     else:
         print("\n💡 To apply these fixes:")
-        print("   Run: python cuda_diagnostic.py --fix")
-        print("   Or manually run the commands above")
+        print("   • Run: python cuda_diagnostic.py --fix  (automatic)")
+        print("   • Or manually run one of the commands above")
+        print("\n⚠️  On Windows, use --extra-index-url instead of --index-url if you get errors")
 
 def test_cuda_inference():
     """Test actual CUDA inference."""
