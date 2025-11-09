@@ -56,6 +56,9 @@ experiments/outputs/
 logs/
 *.log
 
+# User settings
+.model_config
+
 # OS
 .DS_Store
 Thumbs.db

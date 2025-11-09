@@ -78,6 +78,10 @@ def main_menu():
     print()
     print("No coding experience needed - just follow the prompts!")
 
+    # Show current model
+    current_model = get_current_model()
+    print(f"📦 Current model: {current_model}")
+
     options = [
         "🎭 Discover Emotion Circuits (Beginner-Friendly)",
         "🕵️  Detect Deceptive Alignment",
@@ -86,6 +90,7 @@ def main_menu():
         "📚 Open Tutorial Notebooks",
         "🌐 Launch Web Interface",
         "🧪 Testing & Diagnostics",
+        "⚙️  Settings (Change Model)",
         "ℹ️  Help & Documentation"
     ]
 
@@ -106,6 +111,8 @@ def main_menu():
     elif choice == 7:
         testing_menu()
     elif choice == 8:
+        settings_menu()
+    elif choice == 9:
         show_help()
     elif choice == 0:
         print("\n👋 Goodbye! Thanks for using the toolkit!")
@@ -137,9 +144,11 @@ def emotion_circuits_wizard():
     try:
         print("\n⏳ Loading model (this may take a minute)...")
         device = "cuda" if torch.cuda.is_available() else "cpu"
+        model_name = get_current_model()
 
+        print(f"   Using model: {model_name}")
         detector = EmotionCircuitDetector(
-            model_name="gpt2-small",
+            model_name=model_name,
             device=device
         )
         show_success(f"Model loaded on {device}!")
@@ -293,8 +302,11 @@ def deceptive_alignment_wizard():
     try:
         print("\n⏳ Loading model...")
         device = "cuda" if torch.cuda.is_available() else "cpu"
+        model_name = get_current_model()
+
+        print(f"   Using model: {model_name}")
         detector = DeceptiveAlignmentDetector(
-            model_name="gpt2-small",
+            model_name=model_name,
             device=device
         )
         show_success(f"Model loaded on {device}!")
@@ -417,8 +429,11 @@ def power_seeking_wizard():
     try:
         print("\n⏳ Loading model...")
         device = "cuda" if torch.cuda.is_available() else "cpu"
+        model_name = get_current_model()
+
+        print(f"   Using model: {model_name}")
         detector = PowerSeekingDetector(
-            model_name="gpt2-small",
+            model_name=model_name,
             device=device
         )
         show_success(f"Model loaded on {device}!")
@@ -543,9 +558,11 @@ def quick_demo():
     try:
         print("\n⏳ Loading model (this may take a minute on first run)...")
         print("   (The model will be downloaded and cached)")
+        model_name = get_current_model()
 
+        print(f"   Using model: {model_name}")
         detector = EmotionCircuitDetector(
-            model_name="gpt2-small",
+            model_name=model_name,
             device="cpu"  # Use CPU for maximum compatibility
         )
         show_success("Model loaded!")
@@ -928,6 +945,231 @@ def view_testing_docs():
 
     wait_for_user()
     testing_menu()
+
+
+def get_current_model():
+    """Get the currently selected model from config file."""
+    config_file = ".model_config"
+    default_model = "gpt2-small"
+
+    try:
+        if os.path.exists(config_file):
+            with open(config_file, "r") as f:
+                model = f.read().strip()
+                return model if model else default_model
+    except Exception:
+        pass
+
+    return default_model
+
+
+def save_model_preference(model_name):
+    """Save model preference to config file."""
+    config_file = ".model_config"
+    try:
+        with open(config_file, "w") as f:
+            f.write(model_name)
+        return True
+    except Exception as e:
+        print(f"\n⚠️  Warning: Could not save preference: {e}")
+        return False
+
+
+def settings_menu():
+    """Show settings menu."""
+    print_header()
+    print("⚙️  SETTINGS")
+    print()
+    current_model = get_current_model()
+    print(f"Current model: {current_model}")
+    print()
+
+    options = [
+        "🔄 Change Model",
+        "📊 View Model Information",
+        "🔙 Reset to Default (gpt2-small)"
+    ]
+
+    choice = print_menu("Settings Menu", options)
+
+    if choice == 1:
+        model_selection_menu()
+    elif choice == 2:
+        view_model_info()
+    elif choice == 3:
+        save_model_preference("gpt2-small")
+        show_success("Reset to default model: gpt2-small")
+        wait_for_user()
+        settings_menu()
+    elif choice == 0:
+        main_menu()
+
+
+def model_selection_menu():
+    """Interactive model selection with recommendations."""
+    print_header()
+    print("🔄 MODEL SELECTION")
+    print()
+    print("Choose a model based on your hardware and quality needs.")
+    print("All models listed here will work on a 3070 (8GB VRAM).")
+    print()
+
+    current_model = get_current_model()
+    print(f"📦 Current: {current_model}")
+    print()
+
+    # Model options with detailed info
+    models = [
+        {
+            "name": "gpt2-small",
+            "display": "GPT-2 Small (124M) - Fast, basic quality",
+            "vram": "1-2GB",
+            "speed": "⚡⚡⚡",
+            "quality": "⭐",
+            "desc": "Good for testing, fragile with interventions"
+        },
+        {
+            "name": "gpt2-medium",
+            "display": "GPT-2 Medium (355M) - RECOMMENDED FIRST UPGRADE",
+            "vram": "3-4GB",
+            "speed": "⚡⚡",
+            "quality": "⭐⭐⭐",
+            "desc": "Much more robust, great balance of speed/quality"
+        },
+        {
+            "name": "gpt2-large",
+            "display": "GPT-2 Large (774M) - Better quality",
+            "vram": "5-6GB",
+            "speed": "⚡",
+            "quality": "⭐⭐⭐⭐",
+            "desc": "Very robust, handles interventions well"
+        },
+        {
+            "name": "EleutherAI/pythia-1b",
+            "display": "Pythia-1B - BEST FOR RESEARCH",
+            "vram": "4-5GB",
+            "speed": "⚡",
+            "quality": "⭐⭐⭐⭐",
+            "desc": "Designed for interpretability, modern architecture"
+        },
+        {
+            "name": "EleutherAI/pythia-1.4b",
+            "display": "Pythia-1.4B - Maximum quality (safe)",
+            "vram": "5-6GB",
+            "speed": "⚡",
+            "quality": "⭐⭐⭐⭐⭐",
+            "desc": "Best quality that fits comfortably on 3070"
+        },
+        {
+            "name": "gpt2-xl",
+            "display": "GPT-2 XL (1.5B) - BORDERLINE for 3070",
+            "vram": "7-8GB ⚠️",
+            "speed": "⚡",
+            "quality": "⭐⭐⭐⭐⭐",
+            "desc": "Might not fit, close other programs first"
+        }
+    ]
+
+    # Display options
+    print("Available Models:")
+    print("-" * 70)
+    for i, model in enumerate(models, 1):
+        current_marker = " ✓ CURRENT" if model["name"] == current_model else ""
+        print(f"\n  {i}. {model['display']}{current_marker}")
+        print(f"     VRAM: {model['vram']} | Speed: {model['speed']} | Quality: {model['quality']}")
+        print(f"     {model['desc']}")
+
+    print("\n  0. Back to Settings")
+    print("-" * 70)
+
+    while True:
+        try:
+            choice = input("\nSelect a model (number): ").strip()
+            choice_num = int(choice)
+
+            if choice_num == 0:
+                settings_menu()
+                return
+            elif 1 <= choice_num <= len(models):
+                selected_model = models[choice_num - 1]
+
+                # Confirm selection
+                print(f"\n📦 You selected: {selected_model['display']}")
+                print(f"   VRAM needed: {selected_model['vram']}")
+                print(f"   {selected_model['desc']}")
+                print()
+
+                confirm = input("Confirm this selection? (y/n): ").lower().strip()
+                if confirm == 'y':
+                    save_model_preference(selected_model["name"])
+                    show_success(f"Model changed to: {selected_model['name']}")
+                    print("\nℹ️  The new model will be used next time you run a task.")
+                    print("   (Already-loaded models won't change until you restart)")
+                    wait_for_user()
+                    settings_menu()
+                    return
+                else:
+                    print("\nSelection cancelled.")
+                    continue
+            else:
+                print(f"❌ Please enter a number between 0 and {len(models)}")
+        except ValueError:
+            print("❌ Please enter a valid number")
+        except KeyboardInterrupt:
+            settings_menu()
+            return
+
+
+def view_model_info():
+    """Show detailed information about models."""
+    print_header()
+    print("📊 MODEL INFORMATION")
+    print()
+
+    current_model = get_current_model()
+    print(f"Current model: {current_model}")
+    print()
+    print("For detailed model information, see MODELS.md")
+    print()
+    print("=" * 70)
+    print()
+    print("Quick Reference:")
+    print()
+    print("🎯 For Your 3070 (8GB VRAM):")
+    print()
+    print("  First Upgrade:")
+    print("    → gpt2-medium (355M)")
+    print("      Much more robust than small, great quality boost")
+    print()
+    print("  Best for Research:")
+    print("    → EleutherAI/pythia-1b")
+    print("      Designed for interpretability, modern architecture")
+    print()
+    print("  Maximum Quality:")
+    print("    → EleutherAI/pythia-1.4b")
+    print("      Best quality that safely fits on 3070")
+    print()
+    print("=" * 70)
+    print()
+    print("Expected Improvements:")
+    print()
+    print("  GPT-2 Small (current if default):")
+    print("    - Interventions often cause repetition or gibberish")
+    print("    - Smart bounds help but still fragile")
+    print()
+    print("  GPT-2 Medium:")
+    print("    - Much better baseline quality")
+    print("    - Handles interventions well")
+    print("    - Clear emotion modulation effects")
+    print()
+    print("  Pythia-1B/1.4B:")
+    print("    - Excellent quality and robustness")
+    print("    - Research-grade interpretability")
+    print("    - Very coherent with interventions")
+    print()
+
+    wait_for_user()
+    settings_menu()
 
 
 def main():
