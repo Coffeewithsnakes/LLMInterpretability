@@ -12,6 +12,25 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
+def get_device():
+    """Auto-detect best available device."""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device = "cuda"
+            gpu_name = torch.cuda.get_device_name(0)
+            vram_gb = torch.cuda.get_device_properties(0).total_memory / 1024**3
+            print(f"🚀 Using CUDA: {gpu_name} ({vram_gb:.1f} GB VRAM)")
+            return device
+        else:
+            print(f"⚠️  CUDA not available, using CPU (slower but works)")
+            print(f"   💡 Run 'python cuda_diagnostic.py' to check CUDA setup")
+            return "cpu"
+    except:
+        print(f"⚠️  Using CPU")
+        return "cpu"
+
+
 def test_imports():
     """Test that all modules can be imported."""
     print("Testing imports...")
@@ -70,8 +89,9 @@ def test_model_loading():
         from transformer_lens import HookedTransformer
         import torch
 
+        device = get_device()
         print("  Loading gpt2-small (this may take a minute)...")
-        model = HookedTransformer.from_pretrained("gpt2-small", device="cpu")
+        model = HookedTransformer.from_pretrained("gpt2-small", device=device)
         print(f"  ✅ Model loaded: {model.cfg.n_layers} layers, {model.cfg.n_heads} heads")
 
         # Test basic functionality
@@ -97,7 +117,8 @@ def test_hook_api():
         from transformer_lens import HookedTransformer
         import torch
 
-        model = HookedTransformer.from_pretrained("gpt2-small", device="cpu")
+        device = get_device()
+        model = HookedTransformer.from_pretrained("gpt2-small", device=device)
         tokens = model.to_tokens("Hello")
 
         # Test 1: run_with_hooks
@@ -146,8 +167,9 @@ def test_emotion_circuit_detector():
         from src.behavior_detection import EmotionCircuitDetector
         import torch
 
+        device = get_device()
         print("  Creating detector...")
-        detector = EmotionCircuitDetector(model_name="gpt2-small", device="cpu")
+        detector = EmotionCircuitDetector(model_name="gpt2-small", device=device)
         print("  ✅ Detector created")
 
         # Test dataset preparation
@@ -198,7 +220,8 @@ def test_deceptive_alignment_detector():
         from src.behavior_detection import DeceptiveAlignmentDetector
 
         print("  Creating detector...")
-        detector = DeceptiveAlignmentDetector(model_name="gpt2-small", device="cpu")
+        device = get_device()
+        detector = DeceptiveAlignmentDetector(model_name="gpt2-small", device=device)
         print("  ✅ Detector created")
 
         # Test scenario creation
@@ -232,7 +255,8 @@ def test_power_seeking_detector():
         from src.behavior_detection import PowerSeekingDetector
 
         print("  Creating detector...")
-        detector = PowerSeekingDetector(model_name="gpt2-small", device="cpu")
+        device = get_device()
+        detector = PowerSeekingDetector(model_name="gpt2-small", device=device)
         print("  ✅ Detector created")
 
         # Test scenario creation

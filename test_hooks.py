@@ -6,8 +6,19 @@ Quick test to understand TransformerLens hook API
 import torch
 from transformer_lens import HookedTransformer
 
-print("Loading model...")
-model = HookedTransformer.from_pretrained("gpt2-small", device="cpu")
+# Auto-detect best device
+if torch.cuda.is_available():
+    device = "cuda"
+    gpu_name = torch.cuda.get_device_name(0)
+    vram_gb = torch.cuda.get_device_properties(0).total_memory / 1024**3
+    print(f"🚀 Using CUDA: {gpu_name} ({vram_gb:.1f} GB VRAM)")
+else:
+    device = "cpu"
+    print("⚠️  CUDA not available, using CPU")
+    print("💡 Run 'python cuda_diagnostic.py' to check CUDA setup")
+
+print(f"Loading model on {device.upper()}...")
+model = HookedTransformer.from_pretrained("gpt2-small", device=device)
 print("Model loaded!\n")
 
 # Test 1: Understanding add_hook return value

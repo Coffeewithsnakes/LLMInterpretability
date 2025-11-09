@@ -786,6 +786,7 @@ def testing_menu():
         "🧪 Full Test Suite (5-10 minutes) - Comprehensive testing",
         "🔌 Hook API Tests - Low-level TransformerLens validation",
         "🔍 Installation Check - Verify all dependencies",
+        "🎮 CUDA Diagnostic & Auto-Fix - Fix GPU issues",
         "📊 View Testing Documentation"
     ]
 
@@ -800,6 +801,8 @@ def testing_menu():
     elif choice == 4:
         check_installation()
     elif choice == 5:
+        run_cuda_diagnostic()
+    elif choice == 6:
         view_testing_docs()
     elif choice == 0:
         main_menu()
@@ -945,6 +948,89 @@ def view_testing_docs():
     print("\n" + "=" * 70)
     print("\n📖 For the full documentation, read TESTING.md in your text editor")
     print("   or run: cat TESTING.md")
+
+    wait_for_user()
+    testing_menu()
+
+
+def run_cuda_diagnostic():
+    """Run CUDA diagnostic and auto-fix tool."""
+    import subprocess
+
+    print_header()
+    print("🎮 CUDA DIAGNOSTIC & AUTO-FIX")
+    print()
+    print("This tool checks your CUDA setup and fixes common issues.")
+    print()
+    print("What it checks:")
+    print("  • NVIDIA driver installation")
+    print("  • CUDA toolkit (optional)")
+    print("  • PyTorch CUDA support")
+    print("  • GPU detection and memory")
+    print()
+    print("What it can fix:")
+    print("  • Install PyTorch with CUDA support if missing")
+    print("  • Reinstall PyTorch if it's CPU-only")
+    print("  • Test CUDA inference")
+    print()
+
+    options = [
+        "🔍 Run Diagnostic (check only)",
+        "🔧 Run with Auto-Fix (fix issues automatically)",
+        "🧪 Run with Inference Test (full validation)",
+        "📖 Back to Testing Menu"
+    ]
+
+    choice = print_menu("What would you like to do?", options)
+
+    if choice == 1:
+        # Diagnostic only
+        print("\n🏃 Running CUDA diagnostic...\n")
+        print("=" * 70)
+        result = subprocess.run(
+            [sys.executable, "cuda_diagnostic.py"],
+            capture_output=False
+        )
+        print("=" * 70)
+
+    elif choice == 2:
+        # Auto-fix
+        print("\n🔧 Running CUDA diagnostic with auto-fix...")
+        print("⚠️  This may reinstall PyTorch. Continue? (y/n)")
+        confirm = input().strip().lower()
+        if confirm == 'y':
+            print("\n🏃 Running with auto-fix...\n")
+            print("=" * 70)
+            result = subprocess.run(
+                [sys.executable, "cuda_diagnostic.py", "--fix"],
+                capture_output=False
+            )
+            print("=" * 70)
+        else:
+            print("\n✋ Cancelled")
+
+    elif choice == 3:
+        # With inference test
+        print("\n🧪 Running CUDA diagnostic with inference test...")
+        print("This will load a model on GPU to verify everything works.")
+        print()
+        wait_for_user()
+        print("\n🏃 Running with inference test...\n")
+        print("=" * 70)
+        result = subprocess.run(
+            [sys.executable, "cuda_diagnostic.py", "--test"],
+            capture_output=False
+        )
+        print("=" * 70)
+
+    elif choice == 4 or choice == 0:
+        testing_menu()
+        return
+
+    print("\n💡 Tips:")
+    print("  • If you see errors, try the auto-fix option")
+    print("  • CUDA not available? That's OK - CPU still works")
+    print("  • For more help, check TROUBLESHOOTING.md")
 
     wait_for_user()
     testing_menu()
